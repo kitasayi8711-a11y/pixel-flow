@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pixel Flow</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <h1 class="logo">PIXEL FLOW</h1>
+    <div class="stats">
+      <div class="stat-box">
+        <span class="stat-label">SCORE</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">BLOCKS</span>
+        <span class="stat-value" id="blockCount">0</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">LEVEL</span>
+        <span class="stat-value" id="level">1</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN GAME AREA ===== -->
+  <main>
+    <div id="gameWrapper">
+
+      <!-- Conveyor belt + grid container -->
+      <div id="gameArea">
+
+        <!-- Conveyor belt (4 sides) -->
+        <div id="conveyorTop"    class="conveyor conveyor-h"></div>
+        <div id="conveyorRight"  class="conveyor conveyor-v"></div>
+        <div id="conveyorBottom" class="conveyor conveyor-h"></div>
+        <div id="conveyorLeft"   class="conveyor conveyor-v"></div>
+
+        <!-- Pixel block grid -->
+        <div id="grid"></div>
+
+        <!-- Shooter units rendered here by JS -->
+        <canvas id="conveyorCanvas"></canvas>
+      </div>
+
+      <!-- Side panel -->
+      <aside id="panel">
+        <h2>UNITS</h2>
+        <p class="hint">Pick a color and spawn a shooter onto the belt.</p>
+
+        <div id="colorPicker">
+          <button class="color-btn active" data-color="red"    style="--c:#ff4466">RED</button>
+          <button class="color-btn"        data-color="blue"   style="--c:#44aaff">BLUE</button>
+          <button class="color-btn"        data-color="green"  style="--c:#44ff88">GREEN</button>
+          <button class="color-btn"        data-color="yellow" style="--c:#ffdd44">YELLOW</button>
+        </div>
+
+        <button id="spawnBtn">⚡ SPAWN UNIT</button>
+
+        <hr/>
+
+        <div id="waitingSlots">
+          <h3>WAITING</h3>
+          <div id="waitingList"></div>
+        </div>
+
+        <hr/>
+
+        <button id="restartBtn">↺ RESTART</button>
+      </aside>
+    </div>
+
+    <!-- Message overlay (win / lose) -->
+    <div id="overlay" class="hidden">
+      <div id="overlayBox">
+        <h2 id="overlayTitle">YOU WIN!</h2>
+        <p  id="overlayMsg">All blocks cleared!</p>
+        <button id="overlayBtn">PLAY AGAIN</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

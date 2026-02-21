@@ -1,0 +1,352 @@
+/* ============================================================
+   PIXEL FLOW — style.css
+   Dark neon theme, no external libraries
+   ============================================================ */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0a0a14;
+  --surface:   #13132a;
+  --border:    #2a2a55;
+  --text:      #e0e0ff;
+  --dim:       #6666aa;
+
+  --red:    #ff4466;
+  --blue:   #44aaff;
+  --green:  #44ff88;
+  --yellow: #ffdd44;
+
+  --glow-red:    0 0 8px #ff4466, 0 0 20px #ff446655;
+  --glow-blue:   0 0 8px #44aaff, 0 0 20px #44aaff55;
+  --glow-green:  0 0 8px #44ff88, 0 0 20px #44ff8855;
+  --glow-yellow: 0 0 8px #ffdd44, 0 0 20px #ffdd4455;
+
+  --cell: 36px;          /* size of one grid cell */
+  --belt: 48px;          /* conveyor belt thickness */
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  overflow-x: hidden;
+}
+
+/* ---------- Header ---------- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 1.4rem;
+  letter-spacing: 6px;
+  color: var(--blue);
+  text-shadow: var(--glow-blue);
+}
+
+.stats { display: flex; gap: 24px; }
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 2px;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  color: var(--yellow);
+  text-shadow: var(--glow-yellow);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ---------- Main layout ---------- */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px;
+  min-height: calc(100vh - 56px);
+}
+
+#gameWrapper {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ---------- Game area (belt + grid) ---------- */
+#gameArea {
+  position: relative;
+  /* sized dynamically by JS */
+}
+
+/* Conveyor belt strips */
+.conveyor {
+  position: absolute;
+  background: repeating-linear-gradient(
+    90deg,
+    #1a1a3a 0px, #1a1a3a 12px,
+    #222244 12px, #222244 24px
+  );
+  border: 1px solid var(--border);
+  z-index: 1;
+}
+
+.conveyor-h { height: var(--belt); }
+.conveyor-v { width:  var(--belt); }
+
+#conveyorTop    { top: 0;    left: 0;    right: 0; }
+#conveyorBottom { bottom: 0; left: 0;    right: 0; }
+#conveyorLeft   { top: 0;    left: 0;    bottom: 0; }
+#conveyorRight  { top: 0;    right: 0;   bottom: 0; }
+
+/* Grid */
+#grid {
+  position: absolute;
+  display: grid;
+  /* columns/rows set by JS */
+  gap: 2px;
+  z-index: 2;
+}
+
+/* Individual pixel block */
+.block {
+  width:  var(--cell);
+  height: var(--cell);
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: transform 0.1s, opacity 0.2s;
+  cursor: default;
+}
+
+.block.red    { background: var(--red);    box-shadow: var(--glow-red);    }
+.block.blue   { background: var(--blue);   box-shadow: var(--glow-blue);   }
+.block.green  { background: var(--green);  box-shadow: var(--glow-green);  }
+.block.yellow { background: var(--yellow); box-shadow: var(--glow-yellow); }
+
+/* Hit animation */
+.block.hit {
+  transform: scale(1.3);
+  opacity: 0;
+}
+
+/* Canvas for shooter units */
+#conveyorCanvas {
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ---------- Side panel ---------- */
+#panel {
+  width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#panel h2 {
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  color: var(--dim);
+  text-align: center;
+}
+
+#panel h3 {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+
+.hint {
+  font-size: 0.65rem;
+  color: var(--dim);
+  line-height: 1.5;
+  text-align: center;
+}
+
+hr { border: none; border-top: 1px solid var(--border); }
+
+/* Color picker buttons */
+#colorPicker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.color-btn {
+  padding: 8px 4px;
+  border: 2px solid var(--c, #fff);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--c, #fff);
+  font-family: inherit;
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.color-btn:hover,
+.color-btn.active {
+  background: color-mix(in srgb, var(--c, #fff) 20%, transparent);
+  box-shadow: 0 0 10px var(--c, #fff);
+}
+
+/* Spawn / Restart buttons */
+#spawnBtn, #restartBtn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--blue);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--blue);
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+#spawnBtn:hover {
+  background: rgba(68,170,255,0.15);
+  box-shadow: var(--glow-blue);
+}
+
+#restartBtn {
+  border-color: var(--dim);
+  color: var(--dim);
+}
+
+#restartBtn:hover {
+  background: rgba(102,102,170,0.15);
+  box-shadow: 0 0 8px var(--dim);
+}
+
+/* Waiting list */
+#waitingList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.waiting-unit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--c, #fff);
+  background: color-mix(in srgb, var(--c, #fff) 10%, transparent);
+  font-size: 0.65rem;
+  color: var(--c, #fff);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+
+.waiting-unit:hover {
+  box-shadow: 0 0 10px var(--c, #fff);
+}
+
+.waiting-unit .ammo-badge {
+  background: rgba(0,0,0,0.4);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.6rem;
+}
+
+/* ---------- Overlay ---------- */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+#overlay.hidden { display: none; }
+
+#overlayBox {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#overlayTitle {
+  font-size: 2rem;
+  letter-spacing: 6px;
+  color: var(--green);
+  text-shadow: var(--glow-green);
+}
+
+#overlayMsg {
+  color: var(--dim);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+}
+
+#overlayBtn {
+  margin-top: 8px;
+  padding: 12px 32px;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--green);
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+#overlayBtn:hover {
+  background: rgba(68,255,136,0.15);
+  box-shadow: var(--glow-green);
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  :root { --cell: 26px; --belt: 36px; }
+
+  #gameWrapper { flex-direction: column; align-items: center; }
+
+  #panel { width: 100%; flex-direction: row; flex-wrap: wrap; }
+
+  header { flex-direction: column; gap: 8px; }
+}
