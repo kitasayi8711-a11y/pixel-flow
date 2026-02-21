@@ -21,20 +21,33 @@ const COLOR_MAP = {
 const GRID_COLS = 8;
 const GRID_ROWS = 6;
 
-// Pixels per cell (matches CSS --cell)
-const CELL = 36;
-
-// Belt thickness (matches CSS --belt)
-const BELT = 48;
-
-// Shooter unit size on canvas
-const UNIT_SIZE = 34;
-
 // How many ammo shots each unit starts with
 const BASE_AMMO = 4;
 
 // How fast units move along the belt (pixels per frame)
 const SPEED = 1.5;
+
+// These are calculated dynamically based on screen size (see calculateSizes)
+let CELL      = 36;
+let BELT      = 48;
+let UNIT_SIZE = 34;
+
+// Calculate responsive sizes based on current viewport
+function calculateSizes() {
+  const vw = window.innerWidth;
+
+  // On mobile (≤640px) there is no side panel beside the game
+  const isPanelBelow = vw <= 640;
+  const panelW       = isPanelBelow ? 0 : 212; // panel width + gap
+  const margin       = isPanelBelow ? 16 : 32;
+
+  // Available width for the game canvas
+  const available = Math.min(vw - panelW - margin, 500);
+
+  BELT      = Math.max(28, Math.floor(available * 0.095));
+  CELL      = Math.floor((available - BELT * 2) / GRID_COLS);
+  UNIT_SIZE = Math.floor(CELL * 0.88);
+}
 
 // Game loop frame rate cap (ms per frame ≈ 60 fps)
 const FRAME_MS = 16;
@@ -83,8 +96,15 @@ const colorBtns    = document.querySelectorAll('.color-btn');
 // ─────────────────────────────────────────────
 
 function setupLayout() {
+  // Recalculate responsive sizes first
+  calculateSizes();
+
+  // Apply belt thickness to conveyor elements
+  document.querySelectorAll('.conveyor-h').forEach(el => el.style.height = BELT + 'px');
+  document.querySelectorAll('.conveyor-v').forEach(el => el.style.width  = BELT + 'px');
+
   // Total game area size: belt on all 4 sides + grid in middle
-  const areaW = BELT * 2 + GRID_COLS * CELL + (GRID_COLS - 1) * 2;  // 2px gap
+  const areaW = BELT * 2 + GRID_COLS * CELL + (GRID_COLS - 1) * 2;
   const areaH = BELT * 2 + GRID_ROWS * CELL + (GRID_ROWS - 1) * 2;
 
   gameArea.style.width  = areaW + 'px';
@@ -102,8 +122,6 @@ function setupLayout() {
   canvas.width  = areaW;
   canvas.height = areaH;
 
-  // Belt path: counter-clockwise loop around the grid
-  // Each waypoint is the CENTER of a unit position
   buildBeltPath(areaW, areaH);
 }
 
@@ -161,6 +179,8 @@ function buildGrid() {
       el.id = id;
       el.style.gridRow    = row + 1;
       el.style.gridColumn = col + 1;
+      el.style.width      = CELL + 'px';
+      el.style.height     = CELL + 'px';
 
       gridEl.appendChild(el);
 
@@ -564,6 +584,21 @@ overlayBtn.addEventListener('click', () => {
     score = 0;
     startGame();
   }
+});
+
+// ─────────────────────────────────────────────
+// RESIZE HANDLER
+// ─────────────────────────────────────────────
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  // Debounce: wait 200ms after last resize before restarting
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    level = 1;
+    score = 0;
+    startGame();
+  }, 200);
 });
 
 // ─────────────────────────────────────────────
