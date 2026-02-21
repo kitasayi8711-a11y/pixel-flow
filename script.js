@@ -204,7 +204,7 @@ function respawnWaiting(unitData) {
 // Returns the grid cell that a unit is currently "facing"
 // (the block closest to the unit's position)
 function getTargetBlock(unit) {
-  const pos = beltPath[unit.pathIndex];
+  const pos = beltPath[Math.floor(unit.pathIndex) % beltPath.length];
   if (!pos) return null;
 
   // Convert unit canvas coords to grid coords
@@ -226,7 +226,7 @@ function getTargetBlock(unit) {
 
 // Returns the closest alive matching block to a unit (line-of-sight style)
 function findMatchingBlock(unit) {
-  const pos = beltPath[unit.pathIndex];
+  const pos = beltPath[Math.floor(unit.pathIndex) % beltPath.length];
   if (!pos) return null;
 
   let closest = null;
@@ -241,8 +241,8 @@ function findMatchingBlock(unit) {
 
     const dist = Math.hypot(pos.x - bx, pos.y - by);
 
-    // Only shoot if reasonably close (within 2 cell widths + belt)
-    const maxRange = BELT + CELL * 2;
+    // Shoot range: belt thickness + 3 cells
+    const maxRange = BELT + CELL * 3;
     if (dist < maxRange && dist < minDist) {
       minDist = dist;
       closest = { block, bx, by, dist };
